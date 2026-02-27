@@ -37,10 +37,10 @@ export const EnrollmentPage: React.FC<EnrollmentPageProps> = ({ onBack }) => {
           {/* Form Header */}
           <div className="text-center mb-12">
             <h2 className="text-zinc-600 italic text-sm mb-4">
-              Fipsar Patient Support Program Enrollment Form
+              Fipsar Lite Support Program Enrollment Form
             </h2>
             <p className="text-zinc-800 font-bold text-sm leading-relaxed max-w-2xl mx-auto">
-              Fipsar Patient Support offers a dedicated support team to answer questions.
+              Fipsar Lite Support offers a dedicated support team to answer questions.
             </p>
           </div>
 
