@@ -82,3 +82,4 @@ export const LeaveSiteModal: React.FC<LeaveSiteModalProps> = ({ isOpen, onClose,
 };
 
 export default LeaveSiteModal;
+
