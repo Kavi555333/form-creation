@@ -8,16 +8,28 @@ import SupportSection from './components/SupportSection'
 function App() {
   const [currentPage, setCurrentPage] = useState<'home' | 'enrollment'>('home');
 
-  if (currentPage === 'enrollment') {
-    return <EnrollmentPage onBack={() => setCurrentPage('home')} />;
-  }
+  // if (currentPage === 'enrollment') {
+  //   return <EnrollmentPage onBack={() => setCurrentPage('home')} />;
+  // }
   return (
     <>
       <FeedbackModal/>
+
+ {currentPage === 'enrollment' ? (
+        <EnrollmentPage onBack={() => setCurrentPage('home')} />
+      ) :(
+      <>
       <Header/>
       <main>
       <SupportSection onNavigateToEnrollment={() => setCurrentPage('enrollment')}/>
         </main>
+      
+      </>
+      
+      )}
+
+
+      
     </>
   )
 }
