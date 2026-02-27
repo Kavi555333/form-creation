@@ -36,7 +36,7 @@ export const SupportSection: React.FC<SupportSectionProps> = ({ onNavigateToEnro
       <div className="max-w-5xl mx-auto text-center">
         {/* Heading */}
         <h2 className="text-3xl md:text-4xl  mb-12 tracking-tight  text-[#006FF6] ">
-          Information, resources & support await. <span className="font-normal">Sign up here</span>
+          Information, Resources & Support await. <span className="font-normal">Sign up here</span>
         </h2>
 
         {/* Support Card */}
@@ -98,3 +98,4 @@ export const SupportSection: React.FC<SupportSectionProps> = ({ onNavigateToEnro
 };
 
 export default SupportSection;
+
