@@ -20,7 +20,7 @@ export const FeedbackModal: React.FC = () => {
     {
       question: "We value your feedback and would appreciate your help by answering a few questions. All answers are confidential. Please select the option that best describes you:",
       options: [
-        "I am a friend or family member of someone who has or may have MAC lung disease",
+        "I am a friend or family member of someone who has or may have  disease",
         "I am a healthcare professional or work in a healthcare office",
         "Other"
       ]
@@ -37,16 +37,16 @@ export const FeedbackModal: React.FC = () => {
     {
       question: "What brings you to the website today?",
       options: [
-        "To learn more about lungs disease ",
+        "To learn more about  disease ",
         "To learn more about FipsarLite",
         "To find a specific tool or resource for my loved one/friend",
-        "TO learn more from people who have lung disease"
+        "To learn more from people who have  disease"
       ]
     },
     {
       question: "After visiting the website, what do you plan to do next?",
       options: [
-        "Talk to pulmonologist",
+        "Talk to doctor",
         "Talk to infectious disease doctor",
         "Find a Specialist"
       ]
@@ -182,3 +182,5 @@ export const FeedbackModal: React.FC = () => {
 };
 
 export default FeedbackModal;
+
+
