@@ -25,9 +25,9 @@ export const SignUpForm: React.FC = () => {
           For every stage of your treatment journey, there are resources available to you. When you sign up, you'll receive ongoing information, support and resources through email and mail on topics including:
         </p>
         <ul className="list-disc list-inside space-y-1 ml-2">
-          <li>MAC (Mycobacterium avium complex)</li>
+          {/* <li>MAC (Mycobacterium avium complex)</li> */}
           <li>FIPSAR LITE</li>
-          <li>Management approaches for related lung conditions such as bronchiectasis</li>
+          <li>Management approaches for related  conditions such as bronchiectasis</li>
         </ul>
       </div>
 
@@ -91,7 +91,7 @@ export const SignUpForm: React.FC = () => {
 
           {/* Diagnosis Question */}
           <div className="mt-8">
-            <p className="text-sm font-bold text-zinc-800 mb-4">Have you been diagnosed with NTM/MAC lung disease?<span className="text-red-600">*</span></p>
+            <p className="text-sm font-bold text-zinc-800 mb-4">Have you been diagnosed with any disease?<span className="text-red-600">*</span></p>
             <div className="flex gap-8">
               <label className="flex items-center gap-2 cursor-pointer group">
                 <div className="w-5 h-5 rounded-full border-2 border-[#0067FF] flex items-center justify-center group-hover:bg-[#0067FF]/10">
