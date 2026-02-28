@@ -27,7 +27,7 @@ export const SignUpForm: React.FC = () => {
         <ul className="list-disc list-inside space-y-1 ml-2">
           {/* <li>MAC (Mycobacterium avium complex)</li> */}
           <li>FIPSAR LITE</li>
-          <li>Management approaches for related  conditions such as bronchiectasis</li>
+          <li>Management approaches for related  conditions such as any disease</li>
         </ul>
       </div>
 
