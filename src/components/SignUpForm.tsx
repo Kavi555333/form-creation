@@ -1,15 +1,65 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { motion } from 'motion/react';
 import { ChevronRight } from 'lucide-react';
-import ThankYouModal from './ThankYouModal';
+import Swal from 'sweetalert2';
 
 export const SignUpForm: React.FC = () => {
-  const [isModalOpen, setIsModalOpen] = useState(false);
 //   const brandColor = "#0067FF";
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setIsModalOpen(true);
+    const form = e.currentTarget;
+    const formData = new FormData(form);
+    const data = Object.fromEntries(formData.entries());
+    const consent = formData.get('consent');
+
+    // Validation
+    const errors: string[] = [];
+    if (!data.firstName) errors.push('First Name');
+    if (!data.lastName) errors.push('Last Name');
+    if (!data.email) {
+      errors.push('Email');
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email as string)) {
+      errors.push('Valid Email Address');
+    }
+    if (!data.phone) errors.push('Phone Number');
+    if (!data.address) errors.push('Address');
+    if (!data.city) errors.push('City');
+    if (!data.state) errors.push('State');
+    if (!data.zip) errors.push('ZIP Code');
+    if (!data.diagnosis) errors.push('Diagnosis selection');
+    if (!consent) errors.push('Consent checkbox');
+
+    if (errors.length > 0) {
+      Swal.fire({
+        title: 'Validation Error',
+        html: `<div class="text-left">Please provide the following required information:<ul class="list-disc list-inside mt-2 text-red-600 font-medium">${errors.map(err => `<li>${err}</li>`).join('')}</ul></div>`,
+        icon: 'error',
+        confirmButtonColor: '#0067FF',
+        confirmButtonText: 'Fix Errors',
+        customClass: {
+          popup: 'rounded-2xl',
+          confirmButton: 'rounded-lg px-8 py-3 font-bold'
+        }
+      });
+      return;
+    }
+
+    Swal.fire({
+      title: 'Thank You!',
+      text: 'Your sign-up request has been received. You will start receiving resources and updates soon.',
+      icon: 'success',
+      confirmButtonColor: '#0067FF',
+      confirmButtonText: 'Close',
+      customClass: {
+        popup: 'rounded-2xl',
+        confirmButton: 'rounded-lg px-8 py-3 font-bold'
+      }
+    }).then((result) => {
+      if (result.isConfirmed || result.isDismissed) {
+        form.reset();
+      }
+    });
   };
 
   return (
@@ -35,57 +85,59 @@ export const SignUpForm: React.FC = () => {
       <div className="bg-white border border-zinc-200 rounded-lg p-8 md:p-12 shadow-sm">
         <p className="text-xs text-zinc-500 mb-6"><span className="text-red-600">*</span>Required fields</p>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form onSubmit={handleSubmit} noValidate className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* First Name */}
             <div>
               <label className="block text-sm font-bold text-zinc-800 mb-1">First Name<span className="text-red-600">*</span></label>
-              <input type="text" className="w-full border-2 border-[#0067FF]/30 rounded-md p-3 focus:border-[#0067FF] outline-none transition-colors" />
+              <input name="firstName" type="text" className="w-full border-2 border-[#0067FF]/30 rounded-md p-3 focus:border-[#0067FF] outline-none transition-colors" />
             </div>
             {/* Last Name */}
             <div>
               <label className="block text-sm font-bold text-zinc-800 mb-1">Last Name<span className="text-red-600">*</span></label>
-              <input type="text" className="w-full border-2 border-[#0067FF]/30 rounded-md p-3 focus:border-[#0067FF] outline-none transition-colors" />
+              <input name="lastName" type="text" className="w-full border-2 border-[#0067FF]/30 rounded-md p-3 focus:border-[#0067FF] outline-none transition-colors" />
             </div>
             {/* Email */}
             <div>
               <label className="block text-sm font-bold text-zinc-800 mb-1">Email<span className="text-red-600">*</span></label>
-              <input type="email" className="w-full border-2 border-[#0067FF]/30 rounded-md p-3 focus:border-[#0067FF] outline-none transition-colors" />
+              <input name="email" type="email" className="w-full border-2 border-[#0067FF]/30 rounded-md p-3 focus:border-[#0067FF] outline-none transition-colors" />
             </div>
             {/* Phone Number */}
             <div>
               <label className="block text-sm font-bold text-zinc-800 mb-1">Phone Number<span className="text-red-600">*</span></label>
-              <input type="tel" className="w-full border-2 border-[#0067FF]/30 rounded-md p-3 focus:border-[#0067FF] outline-none transition-colors" />
+              <input name="phone" type="tel" className="w-full border-2 border-[#0067FF]/30 rounded-md p-3 focus:border-[#0067FF] outline-none transition-colors" />
             </div>
             {/* Address */}
             <div>
               <label className="block text-sm font-bold text-zinc-800 mb-1">Address<span className="text-red-600">*</span></label>
-              <input type="text" className="w-full border-2 border-[#0067FF]/30 rounded-md p-3 focus:border-[#0067FF] outline-none transition-colors" />
+              <input name="address" type="text" className="w-full border-2 border-[#0067FF]/30 rounded-md p-3 focus:border-[#0067FF] outline-none transition-colors" />
             </div>
             {/* Apartment */}
             <div>
               <label className="block text-sm font-bold text-zinc-800 mb-1">Apartment, suite, etc.</label>
-              <input type="text" className="w-full border-2 border-[#0067FF]/30 rounded-md p-3 focus:border-[#0067FF] outline-none transition-colors" />
+              <input name="apartment" type="text" className="w-full border-2 border-[#0067FF]/30 rounded-md p-3 focus:border-[#0067FF] outline-none transition-colors" />
             </div>
             {/* City */}
             <div>
               <label className="block text-sm font-bold text-zinc-800 mb-1">City<span className="text-red-600">*</span></label>
-              <input type="text" className="w-full border-2 border-[#0067FF]/30 rounded-md p-3 focus:border-[#0067FF] outline-none transition-colors" />
+              <input name="city" type="text" className="w-full border-2 border-[#0067FF]/30 rounded-md p-3 focus:border-[#0067FF] outline-none transition-colors" />
             </div>
             {/* State */}
             <div>
               <label className="block text-sm font-bold text-zinc-800 mb-1">State<span className="text-red-600">*</span></label>
-              <select className="w-full border-2 border-[#0067FF]/30 rounded-md p-3 focus:border-[#0067FF] outline-none transition-colors bg-white appearance-none">
+              <select name="state" className="w-full border-2 border-[#0067FF]/30 rounded-md p-3 focus:border-[#0067FF] outline-none transition-colors bg-white appearance-none">
                 <option value="">Select State</option>
                 <option value="NY">New York</option>
                 <option value="CA">California</option>
-                {/* Add more states as needed */}
+                <option value="TX">Texas</option>
+                <option value="FL">Florida</option>
+                <option value="IL">Illinois</option>
               </select>
             </div>
             {/* ZIP Code */}
             <div>
               <label className="block text-sm font-bold text-zinc-800 mb-1">ZIP Code<span className="text-red-600">*</span></label>
-              <input type="text" className="w-full border-2 border-[#0067FF]/30 rounded-md p-3 focus:border-[#0067FF] outline-none transition-colors" />
+              <input name="zip" type="text" className="w-full border-2 border-[#0067FF]/30 rounded-md p-3 focus:border-[#0067FF] outline-none transition-colors" />
             </div>
           </div>
 
@@ -95,14 +147,14 @@ export const SignUpForm: React.FC = () => {
             <div className="flex gap-8">
               <label className="flex items-center gap-2 cursor-pointer group">
                 <div className="w-5 h-5 rounded-full border-2 border-[#0067FF] flex items-center justify-center group-hover:bg-[#0067FF]/10">
-                  <input type="radio" name="diagnosis" className="sr-only peer" />
+                  <input type="radio" name="diagnosis" value="yes" className="sr-only peer" />
                   <div className="w-2.5 h-2.5 rounded-full bg-[#0067FF] opacity-0 peer-checked:opacity-100 transition-opacity" />
                 </div>
                 <span className="text-sm font-medium text-zinc-700">Yes</span>
               </label>
               <label className="flex items-center gap-2 cursor-pointer group">
                 <div className="w-5 h-5 rounded-full border-2 border-[#0067FF] flex items-center justify-center group-hover:bg-[#0067FF]/10">
-                  <input type="radio" name="diagnosis" className="sr-only peer" />
+                  <input type="radio" name="diagnosis" value="no" className="sr-only peer" />
                   <div className="w-2.5 h-2.5 rounded-full bg-[#0067FF] opacity-0 peer-checked:opacity-100 transition-opacity" />
                 </div>
                 <span className="text-sm font-medium text-zinc-700">No</span>
@@ -113,7 +165,7 @@ export const SignUpForm: React.FC = () => {
           {/* Consent Checkbox */}
           <div className="mt-8 flex gap-4 items-start">
             <div className="mt-1">
-              <input type="checkbox" id="consent" className="w-5 h-5 border-2 border-[#0067FF] rounded cursor-pointer accent-[#0067FF]" />
+              <input type="checkbox" name="consent" id="consent" className="w-5 h-5 border-2 border-[#0067FF] rounded cursor-pointer accent-[#0067FF]" />
             </div>
             <label htmlFor="consent" className="text-sm font-bold text-zinc-800 leading-snug cursor-pointer">
               I am over 18 years of age and consent to fipsar collecting and processing my Health Information as described below.<span className="text-red-600">*</span>
@@ -149,11 +201,8 @@ export const SignUpForm: React.FC = () => {
           </p>
         </div>
       </div>
-
-      <ThankYouModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
     </motion.div>
   );
 };
-
 
 export default SignUpForm;
