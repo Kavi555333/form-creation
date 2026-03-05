@@ -1,69 +1,112 @@
+
 import React from 'react';
-import { motion } from 'motion/react';
+import { motion } from 'framer-motion';           
 import { ChevronRight } from 'lucide-react';
 import Swal from 'sweetalert2';
 
 export const SignUpForm: React.FC = () => {
-//   const brandColor = "#0067FF";
-
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const form = e.currentTarget;
     const formData = new FormData(form);
-    const data = Object.fromEntries(formData.entries());
-    const consent = formData.get('consent');
 
-    // Validation
+    // Validation (keeping your existing logic)
     const errors: string[] = [];
-    if (!data.firstName) errors.push('First Name');
-    if (!data.lastName) errors.push('Last Name');
-    if (!data.email) {
+
+    if (!formData.get('firstName')) errors.push('First Name');
+    if (!formData.get('lastName')) errors.push('Last Name');
+
+    const email = formData.get('email') as string;
+    if (!email) {
       errors.push('Email');
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email as string)) {
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       errors.push('Valid Email Address');
     }
-    if (!data.phone) errors.push('Phone Number');
-    if (!data.address) errors.push('Address');
-    if (!data.city) errors.push('City');
-    if (!data.state) errors.push('State');
-    if (!data.zip) errors.push('ZIP Code');
-    if (!data.diagnosis) errors.push('Diagnosis selection');
-    if (!consent) errors.push('Consent checkbox');
+
+    if (!formData.get('phone')) errors.push('Phone Number');
+    if (!formData.get('address')) errors.push('Address');
+    if (!formData.get('city')) errors.push('City');
+    if (!formData.get('state')) errors.push('State');
+    if (!formData.get('zip')) errors.push('ZIP Code');
+    if (!formData.get('diagnosis')) errors.push('Diagnosis selection');
+    if (!formData.get('consent')) errors.push('Consent checkbox');
 
     if (errors.length > 0) {
       Swal.fire({
         title: 'Validation Error',
-        html: `<div class="text-left">Please provide the following required information:<ul class="list-disc list-inside mt-2 text-red-600 font-medium">${errors.map(err => `<li>${err}</li>`).join('')}</ul></div>`,
+        html: `<div class="text-left">Please provide the following required information:<ul class="list-disc list-inside mt-2 text-red-600 font-medium">${errors
+          .map((err) => `<li>${err}</li>`)
+          .join('')}</ul></div>`,
         icon: 'error',
         confirmButtonColor: '#0067FF',
         confirmButtonText: 'Fix Errors',
         customClass: {
           popup: 'rounded-2xl',
-          confirmButton: 'rounded-lg px-8 py-3 font-bold'
-        }
+          confirmButton: 'rounded-lg px-8 py-3 font-bold',
+        },
       });
       return;
     }
 
+    // Prepare JSON payload
+    const data = Object.fromEntries(formData.entries());
+
+    // Show loading state
     Swal.fire({
-      title: 'Thank You!',
-      text: 'Your sign-up request has been received. You will start receiving resources and updates soon.',
-      icon: 'success',
-      confirmButtonColor: '#0067FF',
-      confirmButtonText: 'Close',
-      customClass: {
-        popup: 'rounded-2xl',
-        confirmButton: 'rounded-lg px-8 py-3 font-bold'
-      }
-    }).then((result) => {
-      if (result.isConfirmed || result.isDismissed) {
-        form.reset();
-      }
+      title: 'Submitting...',
+      allowOutsideClick: false,
+      didOpen: () => {
+        Swal.showLoading();
+      },
     });
+
+    try {
+      const response = await fetch('https://backend-form-creation.onrender.com/api/signp', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        Swal.fire({
+          title: 'Thank You!',
+          text: result.message || 'Your sign-up request has been received. You will start receiving resources and updates soon.',
+          icon: 'success',
+          confirmButtonColor: '#0067FF',
+          confirmButtonText: 'Close',
+          customClass: {
+            popup: 'rounded-2xl',
+            confirmButton: 'rounded-lg px-8 py-3 font-bold',
+          },
+        }).then(() => {
+          form.reset();
+        });
+      } else {
+        // Show specific backend error if available
+        Swal.fire({
+          title: 'Submission Failed',
+          text: result.error || 'Something went wrong. Please try again later.',
+          icon: 'error',
+          confirmButtonColor: '#0067FF',
+        });
+      }
+    } catch (err) {
+      Swal.fire({
+        title: 'Network Error',
+        text: 'Could not connect to the server. Please check your connection and try again.',
+        icon: 'error',
+        confirmButtonColor: '#0067FF',
+      });
+      console.error('Form submission error:', err);
+    }
   };
 
   return (
-    <motion.div 
+    <motion.div
       initial={{ opacity: 0, height: 0 }}
       animate={{ opacity: 1, height: 'auto' }}
       transition={{ duration: 0.5 }}
@@ -75,57 +118,110 @@ export const SignUpForm: React.FC = () => {
           For every stage of your treatment journey, there are resources available to you. When you sign up, you'll receive ongoing information, support and resources through email and mail on topics including:
         </p>
         <ul className="list-disc list-inside space-y-1 ml-2">
-          {/* <li>MAC (Mycobacterium avium complex)</li> */}
           <li>FIPSAR LITE</li>
-          <li>Management approaches for related  conditions such as any disease</li>
+          <li>Management approaches for related conditions such as any disease</li>
         </ul>
       </div>
 
       {/* Form Card */}
       <div className="bg-white border border-zinc-200 rounded-lg p-8 md:p-12 shadow-sm">
-        <p className="text-xs text-zinc-500 mb-6"><span className="text-red-600">*</span>Required fields</p>
+        <p className="text-xs text-zinc-500 mb-6">
+          <span className="text-red-600">*</span>Required fields
+        </p>
 
         <form onSubmit={handleSubmit} noValidate className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* First Name */}
             <div>
-              <label className="block text-sm font-bold text-zinc-800 mb-1">First Name<span className="text-red-600">*</span></label>
-              <input name="firstName" type="text" className="w-full border-2 border-[#0067FF]/30 rounded-md p-3 focus:border-[#0067FF] outline-none transition-colors" />
+              <label className="block text-sm font-bold text-zinc-800 mb-1">
+                First Name<span className="text-red-600">*</span>
+              </label>
+              <input
+                name="firstName"
+                type="text"
+                className="w-full border-2 border-[#0067FF]/30 rounded-md p-3 focus:border-[#0067FF] outline-none transition-colors"
+              />
             </div>
+
             {/* Last Name */}
             <div>
-              <label className="block text-sm font-bold text-zinc-800 mb-1">Last Name<span className="text-red-600">*</span></label>
-              <input name="lastName" type="text" className="w-full border-2 border-[#0067FF]/30 rounded-md p-3 focus:border-[#0067FF] outline-none transition-colors" />
+              <label className="block text-sm font-bold text-zinc-800 mb-1">
+                Last Name<span className="text-red-600">*</span>
+              </label>
+              <input
+                name="lastName"
+                type="text"
+                className="w-full border-2 border-[#0067FF]/30 rounded-md p-3 focus:border-[#0067FF] outline-none transition-colors"
+              />
             </div>
+
             {/* Email */}
             <div>
-              <label className="block text-sm font-bold text-zinc-800 mb-1">Email<span className="text-red-600">*</span></label>
-              <input name="email" type="email" className="w-full border-2 border-[#0067FF]/30 rounded-md p-3 focus:border-[#0067FF] outline-none transition-colors" />
+              <label className="block text-sm font-bold text-zinc-800 mb-1">
+                Email<span className="text-red-600">*</span>
+              </label>
+              <input
+                name="email"
+                type="email"
+                className="w-full border-2 border-[#0067FF]/30 rounded-md p-3 focus:border-[#0067FF] outline-none transition-colors"
+              />
             </div>
+
             {/* Phone Number */}
             <div>
-              <label className="block text-sm font-bold text-zinc-800 mb-1">Phone Number<span className="text-red-600">*</span></label>
-              <input name="phone" type="tel" className="w-full border-2 border-[#0067FF]/30 rounded-md p-3 focus:border-[#0067FF] outline-none transition-colors" />
+              <label className="block text-sm font-bold text-zinc-800 mb-1">
+                Phone Number<span className="text-red-600">*</span>
+              </label>
+              <input
+                name="phone"
+                type="tel"
+                className="w-full border-2 border-[#0067FF]/30 rounded-md p-3 focus:border-[#0067FF] outline-none transition-colors"
+              />
             </div>
+
             {/* Address */}
             <div>
-              <label className="block text-sm font-bold text-zinc-800 mb-1">Address<span className="text-red-600">*</span></label>
-              <input name="address" type="text" className="w-full border-2 border-[#0067FF]/30 rounded-md p-3 focus:border-[#0067FF] outline-none transition-colors" />
+              <label className="block text-sm font-bold text-zinc-800 mb-1">
+                Address<span className="text-red-600">*</span>
+              </label>
+              <input
+                name="address"
+                type="text"
+                className="w-full border-2 border-[#0067FF]/30 rounded-md p-3 focus:border-[#0067FF] outline-none transition-colors"
+              />
             </div>
+
             {/* Apartment */}
             <div>
               <label className="block text-sm font-bold text-zinc-800 mb-1">Apartment, suite, etc.</label>
-              <input name="apartment" type="text" className="w-full border-2 border-[#0067FF]/30 rounded-md p-3 focus:border-[#0067FF] outline-none transition-colors" />
+              <input
+                name="apartment"
+                type="text"
+                className="w-full border-2 border-[#0067FF]/30 rounded-md p-3 focus:border-[#0067FF] outline-none transition-colors"
+              />
             </div>
+
             {/* City */}
             <div>
-              <label className="block text-sm font-bold text-zinc-800 mb-1">City<span className="text-red-600">*</span></label>
-              <input name="city" type="text" className="w-full border-2 border-[#0067FF]/30 rounded-md p-3 focus:border-[#0067FF] outline-none transition-colors" />
+              <label className="block text-sm font-bold text-zinc-800 mb-1">
+                City<span className="text-red-600">*</span>
+              </label>
+              <input
+                name="city"
+                type="text"
+                className="w-full border-2 border-[#0067FF]/30 rounded-md p-3 focus:border-[#0067FF] outline-none transition-colors"
+              />
             </div>
+
             {/* State */}
             <div>
-              <label className="block text-sm font-bold text-zinc-800 mb-1">State<span className="text-red-600">*</span></label>
-              <select name="state" className="w-full border-2 border-[#0067FF]/30 rounded-md p-3 focus:border-[#0067FF] outline-none transition-colors bg-white appearance-none">
+              <label className="block text-sm font-bold text-zinc-800 mb-1">
+                State<span className="text-red-600">*</span>
+              </label>
+              <select
+                name="state"
+                className="w-full border-2 border-[#0067FF]/30 rounded-md p-3 focus:border-[#0067FF] outline-none transition-colors bg-white appearance-none"
+              >
                 <option value="">Select State</option>
                 <option value="NY">New York</option>
                 <option value="CA">California</option>
@@ -134,27 +230,47 @@ export const SignUpForm: React.FC = () => {
                 <option value="IL">Illinois</option>
               </select>
             </div>
+
             {/* ZIP Code */}
             <div>
-              <label className="block text-sm font-bold text-zinc-800 mb-1">ZIP Code<span className="text-red-600">*</span></label>
-              <input name="zip" type="text" className="w-full border-2 border-[#0067FF]/30 rounded-md p-3 focus:border-[#0067FF] outline-none transition-colors" />
+              <label className="block text-sm font-bold text-zinc-800 mb-1">
+                ZIP Code<span className="text-red-600">*</span>
+              </label>
+              <input
+                name="zip"
+                type="text"
+                className="w-full border-2 border-[#0067FF]/30 rounded-md p-3 focus:border-[#0067FF] outline-none transition-colors"
+              />
             </div>
           </div>
 
           {/* Diagnosis Question */}
           <div className="mt-8">
-            <p className="text-sm font-bold text-zinc-800 mb-4">Have you been diagnosed with any disease?<span className="text-red-600">*</span></p>
+            <p className="text-sm font-bold text-zinc-800 mb-4">
+              Have you been diagnosed with any disease?<span className="text-red-600">*</span>
+            </p>
             <div className="flex gap-8">
               <label className="flex items-center gap-2 cursor-pointer group">
                 <div className="w-5 h-5 rounded-full border-2 border-[#0067FF] flex items-center justify-center group-hover:bg-[#0067FF]/10">
-                  <input type="radio" name="diagnosis" value="yes" className="sr-only peer" />
+                  <input
+                    type="radio"
+                    name="diagnosis"
+                    value="yes"
+                    className="sr-only peer"
+                  />
                   <div className="w-2.5 h-2.5 rounded-full bg-[#0067FF] opacity-0 peer-checked:opacity-100 transition-opacity" />
                 </div>
                 <span className="text-sm font-medium text-zinc-700">Yes</span>
               </label>
+
               <label className="flex items-center gap-2 cursor-pointer group">
                 <div className="w-5 h-5 rounded-full border-2 border-[#0067FF] flex items-center justify-center group-hover:bg-[#0067FF]/10">
-                  <input type="radio" name="diagnosis" value="no" className="sr-only peer" />
+                  <input
+                    type="radio"
+                    name="diagnosis"
+                    value="no"
+                    className="sr-only peer"
+                  />
                   <div className="w-2.5 h-2.5 rounded-full bg-[#0067FF] opacity-0 peer-checked:opacity-100 transition-opacity" />
                 </div>
                 <span className="text-sm font-medium text-zinc-700">No</span>
@@ -165,26 +281,38 @@ export const SignUpForm: React.FC = () => {
           {/* Consent Checkbox */}
           <div className="mt-8 flex gap-4 items-start">
             <div className="mt-1">
-              <input type="checkbox" name="consent" id="consent" className="w-5 h-5 border-2 border-[#0067FF] rounded cursor-pointer accent-[#0067FF]" />
+              <input
+                type="checkbox"
+                name="consent"
+                id="consent"
+                className="w-5 h-5 border-2 border-[#0067FF] rounded cursor-pointer accent-[#0067FF]"
+              />
             </div>
-            <label htmlFor="consent" className="text-sm font-bold text-zinc-800 leading-snug cursor-pointer">
-              I am over 18 years of age and consent to fipsar collecting and processing my Health Information as described below.<span className="text-red-600">*</span>
+            <label
+              htmlFor="consent"
+              className="text-sm font-bold text-zinc-800 leading-snug cursor-pointer"
+            >
+              I am over 18 years of age and consent to fipsar collecting and processing my Health Information as described below.
+              <span className="text-red-600">*</span>
             </label>
           </div>
 
           {/* Sign Up Button */}
           <div className="mt-8">
-            <button type="submit" className="flex items-center gap-2 bg-[#D1D5DB] hover:bg-[#0067FF] text-zinc-700 hover:text-white font-bold py-3 px-8 rounded transition-all group">
+            <button
+              type="submit"
+              className="flex items-center gap-2 bg-[#D1D5DB] hover:bg-[#0067FF] text-zinc-700 hover:text-white font-bold py-3 px-8 rounded transition-all group"
+            >
               Sign up
               <ChevronRight size={18} className="group-hover:translate-x-1 transition-transform" />
             </button>
           </div>
         </form>
 
-        {/* Legal Text */}
+        {/* Legal Text remains unchanged */}
         <div className="mt-12 pt-8 border-t border-zinc-100 text-[11px] text-zinc-500 leading-relaxed space-y-4">
           <p>
-            I agree that Fipar may collect, use and process my Health Information, as listed below, to provide information, resources, support and other communications. 
+            I agree that Fipar may collect, use and process my Health Information, as listed below, to provide information, resources, support and other communications.
           </p>
           <ul className="list-disc list-inside space-y-1 ml-2">
             <li>Health conditions, treatments, diseases, or diagnosis;</li>

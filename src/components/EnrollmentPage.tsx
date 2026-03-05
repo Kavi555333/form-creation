@@ -1,5 +1,9 @@
+
+// ################################## Patient Enrollment Form #############################
+
+
 import React from 'react';
-import { motion } from 'motion/react';
+import { motion } from 'framer-motion';
 import Swal from 'sweetalert2';
 
 interface EnrollmentPageProps {
@@ -7,79 +11,106 @@ interface EnrollmentPageProps {
 }
 
 export const EnrollmentPage: React.FC<EnrollmentPageProps> = ({ onBack }) => {
-//   const brandColor = "#0067FF";
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const form = e.currentTarget;
     const formData = new FormData(form);
     const data = Object.fromEntries(formData.entries());
 
-    // Validation
+    // ── Validation ──────────────────────────────────────
     const errors: string[] = [];
     if (!data.firstName) errors.push('Patient First Name');
-    if (!data.lastName) errors.push('Patient Last Name');
-    if (!data.dob) errors.push('Date of Birth');
-    if (!data.gender) errors.push('Gender');
-    if (!data.city) errors.push('City');
-    if (!data.state) errors.push('State');
-    if (!data.zip) errors.push('ZIP Code');
-    if (!data.phone) errors.push('Mobile Phone');
-    if (!data.language) errors.push('Preferred Contact Language');
+    if (!data.lastName)  errors.push('Patient Last Name');
+    if (!data.dob)       errors.push('Date of Birth');
+    if (!data.gender)    errors.push('Gender');
+    if (!data.city)      errors.push('City');
+    if (!data.state)     errors.push('State');
+    if (!data.zip)       errors.push('ZIP Code');
+    if (!data.phone)     errors.push('Mobile Phone');
+    if (!data.language)  errors.push('Preferred Contact Language');
 
     if (errors.length > 0) {
       Swal.fire({
         title: 'Validation Error',
-        html: `<div class="text-left">Please provide the following required information:<ul class="list-disc list-inside mt-2 text-red-600 font-medium">${errors.map(err => `<li>${err}</li>`).join('')}</ul></div>`,
+        html: `<div class="text-left">Please provide:<ul class="list-disc list-inside mt-2 text-red-600 font-medium">${
+          errors.map(err => `<li>${err}</li>`).join('')
+        }</ul></div>`,
         icon: 'error',
         confirmButtonColor: '#0067FF',
         confirmButtonText: 'Fix Errors',
-        customClass: {
-          popup: 'rounded-2xl',
-          confirmButton: 'rounded-lg px-8 py-3 font-bold'
-        }
+        customClass: { popup: 'rounded-2xl', confirmButton: 'rounded-lg px-8 py-3 font-bold' },
       });
       return;
     }
 
+    // ── Show loading ─────────────────────────────────────
     Swal.fire({
-      title: 'Thank You!',
-      text: 'Your enrollment request has been received successfully.',
-      icon: 'success',
-      confirmButtonColor: '#0067FF',
-      confirmButtonText: 'Close',
-      customClass: {
-        popup: 'rounded-2xl',
-        confirmButton: 'rounded-lg px-8 py-3 font-bold'
-      }
-    }).then((result) => {
-      if (result.isConfirmed || result.isDismissed) {
-        form.reset();
-        onBack(); // Go back to home after closing the modal
-      }
+      title: 'Submitting...',
+      allowOutsideClick: false,
+      didOpen: () => Swal.showLoading(),
     });
+
+    // ── POST to backend → Snowflake ──────────────────────
+    try {
+      const response = await fetch('https://backend-form-creation.onrender.com/api/enrollment', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        Swal.fire({
+          title: 'Thank You!',
+          text: result.message || 'Your enrollment request has been received successfully.',
+          icon: 'success',
+          confirmButtonColor: '#0067FF',
+          confirmButtonText: 'Close',
+          customClass: { popup: 'rounded-2xl', confirmButton: 'rounded-lg px-8 py-3 font-bold' },
+        }).then(() => {
+          form.reset();
+          onBack();
+        });
+      } else {
+        Swal.fire({
+          title: 'Submission Failed',
+          text: result.error || 'Something went wrong. Please try again.',
+          icon: 'error',
+          confirmButtonColor: '#0067FF',
+        });
+      }
+    } catch (err) {
+      Swal.fire({
+        title: 'Network Error',
+        text: 'Could not connect to server. Please check your connection.',
+        icon: 'error',
+        confirmButtonColor: '#0067FF',
+      });
+      console.error('Enrollment error:', err);
+    }
   };
 
   return (
-    <motion.div 
+    <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       className="min-h-screen bg-[#F5F7FA] py-12 px-4"
     >
       <div className="max-w-4xl mx-auto">
-        {/* Logo Header */}
+        {/* Logo */}
         <div className="flex flex-col items-center mb-12">
-          <img 
-            src="https://www.fipsar.com/assets/img/Fipsar-logo.jpg" 
-            alt="Fipsar Logo" 
+          <img
+            src="https://www.fipsar.com/assets/img/Fipsar-logo.jpg"
+            alt="Fipsar Logo"
             className="h-16 md:h-24 object-contain"
             referrerPolicy="no-referrer"
           />
         </div>
 
-        {/* Form Container */}
+        {/* Form Card */}
         <div className="bg-white shadow-sm border border-zinc-200 rounded-sm p-8 md:p-16">
-          {/* Form Header */}
           <div className="text-center mb-12">
             <h2 className="text-zinc-600 italic text-sm mb-4">
               Fipsar Lite Support Program Enrollment Form
@@ -90,41 +121,60 @@ export const EnrollmentPage: React.FC<EnrollmentPageProps> = ({ onBack }) => {
           </div>
 
           <form onSubmit={handleSubmit} noValidate className="space-y-12">
-            {/* Patient Information Section */}
             <section>
               <h3 className="text-zinc-700 font-bold text-lg border-b border-zinc-100 pb-2 mb-8 uppercase tracking-wide">
                 Patient Information
               </h3>
 
               <div className="space-y-8">
-                {/* Name Fields */}
+                {/* Name */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                   <div>
-                    <label className="block text-zinc-800 font-bold mb-2">Patient Name <span className="text-red-600">*</span></label>
-                    <input name="firstName" type="text" className="w-full border border-zinc-300 rounded-sm p-3 focus:border-[#0067FF] outline-none transition-all" />
+                    <label className="block text-zinc-800 font-bold mb-2">
+                      Patient Name <span className="text-red-600">*</span>
+                    </label>
+                    <input
+                      name="firstName" type="text"
+                      className="w-full border border-zinc-300 rounded-sm p-3 focus:border-[#0067FF] outline-none transition-all"
+                    />
                     <span className="text-[10px] text-zinc-400 mt-1 block">Patient First Name</span>
                   </div>
                   <div className="flex flex-col justify-end">
-                    <input name="lastName" type="text" className="w-full border border-zinc-300 rounded-sm p-3 focus:border-[#0067FF] outline-none transition-all" />
+                    <input
+                      name="lastName" type="text"
+                      className="w-full border border-zinc-300 rounded-sm p-3 focus:border-[#0067FF] outline-none transition-all"
+                    />
                     <span className="text-[10px] text-zinc-400 mt-1 block">Patient Last Name</span>
                   </div>
                 </div>
 
-                {/* DOB Field */}
+                {/* DOB */}
                 <div className="max-w-xs">
-                  <label className="block text-zinc-800 font-bold mb-2">DOB <span className="text-red-600">*</span></label>
+                  <label className="block text-zinc-800 font-bold mb-2">
+                    DOB <span className="text-red-600">*</span>
+                  </label>
                   <div className="relative">
-                    <input name="dob" type="text" placeholder="MM-DD-YYYY" className="w-full border border-zinc-300 rounded-sm p-3 focus:border-[#0067FF] outline-none transition-all" />
+                    <input
+                      name="dob" type="text" placeholder="MM-DD-YYYY"
+                      className="w-full border border-zinc-300 rounded-sm p-3 focus:border-[#0067FF] outline-none transition-all"
+                    />
                     <div className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-300">
-                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                        <line x1="16" y1="2" x2="16" y2="6"></line>
+                        <line x1="8" y1="2" x2="8" y2="6"></line>
+                        <line x1="3" y1="10" x2="21" y2="10"></line>
+                      </svg>
                     </div>
                   </div>
                   <span className="text-[10px] text-zinc-400 mt-1 block">Date</span>
                 </div>
 
-                {/* Gender Field */}
+                {/* Gender */}
                 <div>
-                  <label className="block text-zinc-800 font-bold mb-4">Gender <span className="text-red-600">*</span></label>
+                  <label className="block text-zinc-800 font-bold mb-4">
+                    Gender <span className="text-red-600">*</span>
+                  </label>
                   <div className="space-y-3">
                     {['Male', 'Female', 'Non-binary', 'Unknown'].map((gender) => (
                       <label key={gender} className="flex items-center gap-3 cursor-pointer group">
@@ -138,7 +188,7 @@ export const EnrollmentPage: React.FC<EnrollmentPageProps> = ({ onBack }) => {
                   </div>
                 </div>
 
-                {/* Address Fields */}
+                {/* Address Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                   <div>
                     <label className="block text-zinc-800 font-bold mb-2">City <span className="text-red-600">*</span></label>
@@ -150,6 +200,9 @@ export const EnrollmentPage: React.FC<EnrollmentPageProps> = ({ onBack }) => {
                       <option value="">Please Select</option>
                       <option value="NY">New York</option>
                       <option value="CA">California</option>
+                      <option value="TX">Texas</option>
+                      <option value="FL">Florida</option>
+                      <option value="IL">Illinois</option>
                     </select>
                   </div>
                   <div>
@@ -162,9 +215,11 @@ export const EnrollmentPage: React.FC<EnrollmentPageProps> = ({ onBack }) => {
                   </div>
                 </div>
 
-                {/* Language Field */}
+                {/* Language */}
                 <div>
-                  <label className="block text-zinc-800 font-bold mb-4">Preferred Contact Language <span className="text-red-600">*</span></label>
+                  <label className="block text-zinc-800 font-bold mb-4">
+                    Preferred Contact Language <span className="text-red-600">*</span>
+                  </label>
                   <div className="space-y-3">
                     {['English', 'Spanish', 'Other'].map((lang) => (
                       <label key={lang} className="flex items-center gap-3 cursor-pointer group">
@@ -180,26 +235,21 @@ export const EnrollmentPage: React.FC<EnrollmentPageProps> = ({ onBack }) => {
               </div>
             </section>
 
-            {/* Footer Legal */}
+            {/* Footer */}
             <div className="pt-12 border-t border-zinc-100">
               <p className="text-[10px] text-zinc-500 font-bold leading-relaxed">
-                © 2026 Fipsar Incorporated. All Rights Reserved. 
+                © 2026 Fipsar Incorporated. All Rights Reserved.
               </p>
             </div>
 
-            {/* Submit Button */}
+            {/* Buttons */}
             <div className="flex justify-end pt-8">
-              <button 
-                type="button"
-                onClick={onBack}
-                className="mr-4 px-8 py-3 text-zinc-500 font-bold hover:text-zinc-800 transition-all"
-              >
+              <button type="button" onClick={onBack}
+                className="mr-4 px-8 py-3 text-zinc-500 font-bold hover:text-zinc-800 transition-all">
                 Back
               </button>
-              <button 
-                type="submit"
-                className="bg-[#0067FF] hover:bg-[#0056D6] text-white font-bold py-3 px-12 rounded shadow-lg transition-all"
-              >
+              <button type="submit"
+                className="bg-[#0067FF] hover:bg-[#0056D6] text-white font-bold py-3 px-12 rounded shadow-lg transition-all">
                 Submit
               </button>
             </div>
@@ -211,4 +261,5 @@ export const EnrollmentPage: React.FC<EnrollmentPageProps> = ({ onBack }) => {
 };
 
 export default EnrollmentPage;
+
 
