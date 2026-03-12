@@ -82,6 +82,12 @@ export const SignUpForm: React.FC = () => {
 
       {/* Form Card */}
       <div className="bg-white border border-zinc-200 rounded-lg p-8 md:p-12 shadow-sm">
+        <div className="text-center">
+            <h1 className="text-3xl font-bold relative inline-block">
+                Enrollment Form
+                <span className="block h-1 w-12 bg-blue-500 mx-auto mt-2"></span>
+            </h1>
+        </div>
         <p className="text-xs text-zinc-500 mb-6"><span className="text-red-600">*</span>Required fields</p>
 
         <form onSubmit={handleSubmit} noValidate className="space-y-6">
