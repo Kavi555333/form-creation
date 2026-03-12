@@ -70,16 +70,15 @@ export const SignUpForm: React.FC = () => {
       className="mt-12 text-left max-w-4xl mx-auto"
     >
       {/* Intro Text */}
-      <div className="mb-8 text-zinc-700 text-sm md:text-base leading-relaxed">
+      {/* <div className="mb-8 text-zinc-700 text-sm md:text-base leading-relaxed">
         <p className="mb-4">
           For every stage of your treatment journey, there are resources available to you. When you sign up, you'll receive ongoing information, support and resources through email and mail on topics including:
         </p>
         <ul className="list-disc list-inside space-y-1 ml-2">
-          {/* <li>MAC (Mycobacterium avium complex)</li> */}
           <li>FIPSAR LITE</li>
           <li>Management approaches for related  conditions such as any disease</li>
         </ul>
-      </div>
+      </div> */}
 
       {/* Form Card */}
       <div className="bg-white border border-zinc-200 rounded-lg p-8 md:p-12 shadow-sm">
@@ -113,10 +112,10 @@ export const SignUpForm: React.FC = () => {
               <input name="address" type="text" className="w-full border-2 border-[#0067FF]/30 rounded-md p-3 focus:border-[#0067FF] outline-none transition-colors" />
             </div>
             {/* Apartment */}
-            <div>
+            {/* <div>
               <label className="block text-sm font-bold text-zinc-800 mb-1">Apartment, suite, etc.</label>
               <input name="apartment" type="text" className="w-full border-2 border-[#0067FF]/30 rounded-md p-3 focus:border-[#0067FF] outline-none transition-colors" />
-            </div>
+            </div> */}
             {/* City */}
             <div>
               <label className="block text-sm font-bold text-zinc-800 mb-1">City<span className="text-red-600">*</span></label>
@@ -175,14 +174,14 @@ export const SignUpForm: React.FC = () => {
           {/* Sign Up Button */}
           <div className="mt-8">
             <button type="submit" className="flex items-center gap-2 bg-[#D1D5DB] hover:bg-[#0067FF] text-zinc-700 hover:text-white font-bold py-3 px-8 rounded transition-all group">
-              Sign up
+              Submit
               <ChevronRight size={18} className="group-hover:translate-x-1 transition-transform" />
             </button>
           </div>
         </form>
 
         {/* Legal Text */}
-        <div className="mt-12 pt-8 border-t border-zinc-100 text-[11px] text-zinc-500 leading-relaxed space-y-4">
+        {/* <div className="mt-12 pt-8 border-t border-zinc-100 text-[11px] text-zinc-500 leading-relaxed space-y-4">
           <p>
             I agree that Fipar may collect, use and process my Health Information, as listed below, to provide information, resources, support and other communications. 
           </p>
@@ -199,7 +198,7 @@ export const SignUpForm: React.FC = () => {
           <p>
             I understand that I am not required to consent to collection, use and processing of my Health Information for these purposes. However, if I do not consent, I will not be able to sign up, as collection, use and processing of my Health Information is necessary for fipsar to provide these services to me.
           </p>
-        </div>
+        </div> */}
       </div>
     </motion.div>
   );
