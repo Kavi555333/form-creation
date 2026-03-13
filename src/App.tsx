@@ -449,7 +449,7 @@ export default function App() {
 
         {/* Logo */}
         <div className="flex justify-start mb-4">
-          <img src="https://www.fipsar.com/assets/img/Fipsar-logo.jpg" " alt="Fipsar Logo" className="h-10" />
+          <img src="https://www.fipsar.com/assets/img/Fipsar-logo.jpg"  alt="Fipsar Logo" className="h-10" />
         </div>
 
         {/* Title */}
